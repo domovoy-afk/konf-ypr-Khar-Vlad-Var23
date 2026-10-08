@@ -1,43 +1,13 @@
 
 import argparse
 import getpass
-import os
-import shlex
 import socket
 import sys
 import tkinter as tk
 from tkinter import scrolledtext
 
-class ShellEngine:
-    def __init__(self):
-        self.history_list = []
-
-    def parse_line(self, line):
-        expanded = os.path.expandvars(line)
-        return shlex.split(expanded)
-
-    def execute(self, line):
-        line = line.strip()
-        if not line:
-            return ""
-        self.history_list.append(line)
-        try:
-            args = self.parse_line(line)
-        except Exception as e:
-            return f"Parse error: {e}"
-
-        if not args:
-            return ""
-
-        cmd = args[0]
-        cmd_args = args[1:]
-
-        if cmd == "exit":
-            return "EXIT"
-        elif cmd in ("ls", "cd"):
-            return f"{cmd} {' '.join(cmd_args)}".strip()
-        else:
-            return f"{cmd}: command not found"
+from shell import ShellEngine
+from vfs import VFS
 
 class EmulatorGUI:
     def __init__(self, root, engine):
@@ -84,9 +54,8 @@ if __name__ == "__main__":
     parser.add_argument("--script", help="Path to startup script", default=None)
     args = parser.parse_args()
 
-    print(f"Debug Params -> VFS: {args.vfs}, Script: {args.script}")
-
-    engine = ShellEngine()
+    vfs_obj = VFS(args.vfs) if args.vfs else VFS()
+    engine = ShellEngine(vfs_obj)
 
     if args.script:
         try:
