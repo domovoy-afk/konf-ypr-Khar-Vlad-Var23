@@ -1,0 +1,13 @@
+{
+  "type": "dir",
+  "children": {
+    "file1.txt": {
+      "type": "file",
+      "content": "First Line\nSecond Line"
+    },
+    "docs": {
+      "type": "dir",
+      "children": {}
+    }
+  }
+}
