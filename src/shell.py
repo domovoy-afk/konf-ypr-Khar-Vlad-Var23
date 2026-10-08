@@ -68,5 +68,22 @@ class ShellEngine:
                 lines = node.get("content", "").splitlines()
                 return "\n".join(lines[:10])
             return f"head: {cmd_args[0]}: No such file"
+        elif cmd == "mv":
+            if len(cmd_args) < 2:
+                return "mv: missing file operand"
+            src = self.cwd + cmd_args[0].split("/")
+            dest = self.cwd + cmd_args[1].split("/")
+            if self.vfs.move_node(src, dest):
+                return ""
+            return "mv: failed to move"
+        elif cmd == "vfs-load":
+            if not cmd_args:
+                return "vfs-load: missing path"
+            try:
+                self.vfs.load_from_json(cmd_args[0])
+                self.cwd = []
+                return "VFS successfully loaded"
+            except Exception as e:
+                return f"vfs-load error: {e}"
         else:
             return f"{cmd}: command not found"
