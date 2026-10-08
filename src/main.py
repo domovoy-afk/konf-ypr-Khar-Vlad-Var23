@@ -1,7 +1,10 @@
+
+import argparse
 import getpass
 import os
 import shlex
 import socket
+import sys
 import tkinter as tk
 from tkinter import scrolledtext
 
@@ -76,7 +79,29 @@ class EmulatorGUI:
             self.write_output(f"{res}\n")
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--vfs", help="Path to VFS JSON file", default=None)
+    parser.add_argument("--script", help="Path to startup script", default=None)
+    args = parser.parse_args()
+
+    print(f"Debug Params -> VFS: {args.vfs}, Script: {args.script}")
+
     engine = ShellEngine()
+
+    if args.script:
+        try:
+            with open(args.script, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#"):
+                        res = engine.execute(line)
+                        if "not found" in res or "error" in res.lower():
+                            print(f"Script Error: {res}")
+                            sys.exit(1)
+        except Exception as e:
+            print(f"Script reading failed: {e}")
+            sys.exit(1)
+
     root = tk.Tk()
     app = EmulatorGUI(root, engine)
     root.mainloop()
