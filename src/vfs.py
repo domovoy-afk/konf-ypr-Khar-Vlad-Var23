@@ -21,3 +21,20 @@ class VFS:
                 return None
             curr = curr["children"][part]
         return curr
+
+    def move_node(self, src_parts, dest_parts):
+        if not src_parts or not dest_parts:
+            return False
+        src_parent = self.get_node(src_parts[:-1])
+        dest_parent = self.get_node(dest_parts[:-1])
+        src_name = src_parts[-1]
+        dest_name = dest_parts[-1]
+        if not src_parent or src_name not in src_parent.get("children", {}):
+            return False
+        if not dest_parent:
+            return False
+        node = src_parent["children"].pop(src_name)
+        if "children" not in dest_parent:
+            dest_parent["children"] = {}
+        dest_parent["children"][dest_name] = node
+        return True
